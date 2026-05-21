@@ -1,10 +1,4 @@
-const express = require('express');
-
-const app = express();
-
-app.get('/', (req, res) => {
-  res.send('Titan Hardware API');
-});
+const app = require('./src/app');
 
 app.listen(3000, () => {
   console.log('Servidor rodando na porta 3000');
