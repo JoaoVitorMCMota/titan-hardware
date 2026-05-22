@@ -1,15 +1,16 @@
+const Product = require('../models/Product');
+
 class ProductController {
-  listar(req, res) {
-    res.json([
-      {
-        id: 1,
-        nome: 'RTX 5070'
-      },
-      {
-        id: 2,
-        nome: 'Ryzen 7'
-      }
-    ]);
+  async listar(req, res) {
+    const produtos = await Product.find();
+
+    res.json(produtos);
+  }
+
+  async criar(req, res) {
+    const produto = await Product.create(req.body);
+
+    res.status(201).json(produto);
   }
 }
 
