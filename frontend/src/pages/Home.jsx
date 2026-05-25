@@ -2,13 +2,18 @@ import { useEffect, useState } from 'react';
 
 import api from '../services/api';
 
+import ProductCard from '../components/ProductCard';
+
 function Home() {
 
   const [produtos, setProdutos] = useState([]);
 
   async function carregarProdutos() {
+
     try {
-      const response = await api.get('/produtos');
+
+      const response =
+        await api.get('/produtos');
 
       setProdutos(response.data);
 
@@ -22,27 +27,23 @@ function Home() {
   }, []);
 
   return (
-    <div>
 
-      <h1>Titan Hardware</h1>
+    <div className="container">
 
-      <h2>Produtos</h2>
+      <h1>Produtos Gamer</h1>
 
-      {
-        produtos.map((produto) => (
-          <div key={produto._id}>
+      <div className="products-grid">
 
-            <h3>{produto.nome}</h3>
+        {
+          produtos.map((produto) => (
+            <ProductCard
+              key={produto._id}
+              produto={produto}
+            />
+          ))
+        }
 
-            <p>{produto.descricao}</p>
-
-            <p>R$ {produto.preco}</p>
-
-            <hr />
-
-          </div>
-        ))
-      }
+      </div>
 
     </div>
   );
