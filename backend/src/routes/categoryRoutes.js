@@ -12,16 +12,29 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: Lista de categorias obtida com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Categoria'
- *       500:
- *         description: Erro ao listar categorias
  */
 router.get('/', CategoryController.listar);
+
+/**
+ * @swagger
+ * /categorias/{id}:
+ *   get:
+ *     summary: Busca uma categoria por ID
+ *     tags: [Categorias]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da categoria
+ *     responses:
+ *       200:
+ *         description: Categoria encontrada
+ *       404:
+ *         description: Categoria não encontrada
+ */
+router.get('/:id', CategoryController.buscarPorId);
 
 /**
  * @swagger
@@ -36,8 +49,8 @@ router.get('/', CategoryController.listar);
  *           schema:
  *             $ref: '#/components/schemas/Categoria'
  *           example:
- *             nome: "Memória RAM"
- *             descricao: "Módulos de memória RAM de diferentes capacidades"
+ *             nome: "Placas de Vídeo"
+ *             descricao: "GPUs para jogos e renderização"
  *     responses:
  *       201:
  *         description: Categoria criada com sucesso
@@ -49,5 +62,62 @@ router.get('/', CategoryController.listar);
  *         description: Erro na validação dos dados
  */
 router.post('/', CategoryController.criar);
+
+/**
+ * @swagger
+ * /categorias/{id}:
+ *   put:
+ *     summary: Atualiza uma categoria
+ *     tags: [Categorias]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da categoria
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Categoria'
+ *           example:
+ *             nome: "Coolers"
+ *             descricao: "Sistemas de refrigeração para PCs"
+ *     responses:
+ *       200:
+ *         description: Categoria atualizada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Categoria'
+ *       404:
+ *         description: Categoria não encontrada
+ *       400:
+ *         description: Erro na validação dos dados
+ */
+router.put('/:id', CategoryController.atualizar);
+
+/**
+ * @swagger
+ * /categorias/{id}:
+ *   delete:
+ *     summary: Deleta uma categoria
+ *     tags: [Categorias]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da categoria
+ *     responses:
+ *       200:
+ *         description: Categoria deletada
+ *       404:
+ *         description: Categoria não encontrada
+ */
+router.delete('/:id', CategoryController.deletar);
 
 export default router;
