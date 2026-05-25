@@ -1,17 +1,23 @@
-const Category = require('../models/Category');
+import Category from '../models/Category.js';
 
 class CategoryController {
   async listar(req, res) {
-    const categorias = await Category.find();
-
-    res.json(categorias);
+    try {
+      const categorias = await Category.find();
+      res.json(categorias);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
 
   async criar(req, res) {
-    const categoria = await Category.create(req.body);
-
-    res.status(201).json(categoria);
+    try {
+      const categoria = await Category.create(req.body);
+      res.status(201).json(categoria);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
   }
 }
 
-module.exports = new CategoryController();
+export default new CategoryController();

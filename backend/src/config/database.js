@@ -1,13 +1,19 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 async function connectDatabase() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/titanHardwareDB');
+    const mongoUri = process.env.MONGO_URI;
+    
+    if (!mongoUri) {
+      throw new Error('MONGO_URI não está definida no arquivo .env');
+    }
 
-    console.log('MongoDB conectado');
+    await mongoose.connect(mongoUri);
+    console.log('MongoDB Atlas conectado com sucesso!');
   } catch (error) {
-    console.log(error);
+    console.error('Erro ao conectar no MongoDB Atlas:', error.message);
+    process.exit(1);
   }
 }
 
-module.exports = connectDatabase;
+export default connectDatabase;

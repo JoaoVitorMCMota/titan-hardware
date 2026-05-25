@@ -1,9 +1,12 @@
-const app = require('./src/app');
+import 'dotenv/config.js';
+import app from './src/app.js';
+import connectDatabase from './src/config/database.js';
 
-const connectDatabase = require('./src/config/database');
+// Conectar ao MongoDB
+await connectDatabase();
 
-connectDatabase();
-
-app.listen(3000, () => {
-  console.log('Servidor rodando na porta 3000');
+// Iniciar servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando http://localhost:${PORT}`);
 });

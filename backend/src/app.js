@@ -1,10 +1,8 @@
-const express = require('express');
-
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./docs/swagger');
-
-const productRoutes = require('./routes/productRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
+import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './docs/swagger.js';
+import productRoutes from './routes/productRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 
 const app = express();
 
@@ -21,4 +19,5 @@ app.use('/produtos', productRoutes);
 app.use('/categorias', categoryRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-module.exports = app;
+
+export default app;
