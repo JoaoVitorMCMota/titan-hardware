@@ -8,22 +8,24 @@ function Home() {
 
   const [produtos, setProdutos] = useState([]);
 
+  async function buscarProdutos() {
+    const response = await api.get('/produtos');
+    return response.data;
+  }
+
   async function carregarProdutos() {
-
     try {
-
-      const response =
-        await api.get('/produtos');
-
-      setProdutos(response.data);
-
+      const data = await buscarProdutos();
+      setProdutos(data);
     } catch (error) {
       console.log(error);
     }
   }
 
   useEffect(() => {
-    carregarProdutos();
+    buscarProdutos()
+      .then((data) => setProdutos(data))
+      .catch((error) => console.log(error));
   }, []);
 
   return (
@@ -39,6 +41,7 @@ function Home() {
             <ProductCard
               key={produto._id}
               produto={produto}
+              onChange={carregarProdutos}
             />
           ))
         }
