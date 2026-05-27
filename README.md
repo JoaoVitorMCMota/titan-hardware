@@ -94,3 +94,6 @@ MONGO_URI=mongodb+srv://usuario:senha123@cluster0.exemplo.mongodb.net/titan-hard
 JWT_SECRET=minha_chave_secreta_dev_abc123xyz
 PORT=3000
 ```
+# Autor
+
+João Vítor
