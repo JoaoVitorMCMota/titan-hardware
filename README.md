@@ -41,13 +41,15 @@ npm install
 
 Crie o arquivo `.env` na pasta `backend` (veja a seção [Variáveis de ambiente](#variáveis-de-ambiente)).
 
-Inicie a API:
+Inicie a API em modo de desenvolvimento (com [Nodemon](https://nodemon.io/), que reinicia o servidor ao salvar alterações):
 
 ```bash
-node server.js
+npm run dev
 ```
 
 O servidor sobe em **http://localhost:3000** (ou na porta definida em `PORT`).
+
+Para subir sem recarregamento automático (produção ou teste pontual), use `node server.js`.
 
 ### 3. Configurar o frontend
 

@@ -33,7 +33,7 @@ function Home() {
     <div className="container">
 
       <h1>Produtos Gamer</h1>
-
+      <p>Os melhores hardwares gamers do mercado.</p>
       <div className="products-grid">
 
         {
