@@ -1,5 +1,4 @@
 import express from 'express';
-
 import AuthController from '../controllers/AuthController.js';
 
 const router = express.Router();
@@ -14,10 +13,13 @@ const router = express.Router();
  *       required: true
  *       content:
  *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Usuario'
  *           example:
  *             nome: "João"
  *             email: "joao@email.com"
  *             senha: "123456"
+ *             role: "usuario"
  *     responses:
  *       201:
  *         description: Usuário criado com sucesso

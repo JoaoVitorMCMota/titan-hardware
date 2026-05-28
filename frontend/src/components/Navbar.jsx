@@ -1,32 +1,33 @@
 import { Link } from 'react-router-dom';
 
-// 1. Adicionamos { carrinho } aqui nos parâmetros para receber os dados do App.jsx
-function Navbar({ carrinho }) {
+function Navbar({ carrinho, usuario, onLogout }) {
   return (
-    <nav className="navbar">
-      
+    <nav className="navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px', background: '#222', color: '#fff' }}>
       <h2>Titan Hardware</h2>
       
-      <div>
-        <Link to="/">
-          Home
-        </Link>
-        
-        <Link to="/criar-produto">
-          Criar Produto
-        </Link>
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+        {/* Se tiver usuário logado, mostra os links */}
+        {usuario && (
+          <>
+            <Link to="/home" style={{ color: '#fff', textDecoration: 'none' }}>Home</Link>
+            
+            {/* SÓ MOSTRA SE FOR ADMIN */}
+            {usuario.role === 'admin' && (
+              <Link to="/criar-produto" style={{ color: '#fff', textDecoration: 'none' }}>Criar Produto</Link>
+            )}
 
-        {/* 2. Link para a nova tela de Login */}
-        <Link to="/login">
-          Login
-        </Link>
+            <Link to="/carrinho" style={{ color: '#fff', textDecoration: 'none', fontWeight: 'bold' }}>
+              🛒 Carrinho ({carrinho.length})
+            </Link>
+
+            <span style={{ color: '#aaa', fontSize: '14px' }}>({usuario.email})</span>
+            
+            <button onClick={onLogout} style={{ background: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>
+              Sair
+            </button>
+          </>
+        )}
       </div>
-
-      {/* 3. Exibição da quantidade de itens no carrinho */}
-      <div style={{ marginLeft: 'auto', fontWeight: 'bold' }}>
-        <span>🛒 Carrinho: {carrinho ? carrinho.length : 0} itens</span>
-      </div>
-
     </nav>
   );
 }

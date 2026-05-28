@@ -7,7 +7,8 @@ class AuthController {
 
   async register(req, res) {
     try {
-      const { nome, email, senha } = req.body;
+      // ALTERADO: Adicionamos o 'role' na desestruturação do corpo da requisição
+      const { nome, email, senha, role } = req.body;
 
       const usuarioExiste = await User.findOne({ email });
 
@@ -19,11 +20,16 @@ class AuthController {
 
       const senhaHash = await bcrypt.hash(senha, 8);
 
+      // ALTERADO: Passamos o 'role' (se não for enviado, o Mongoose usará o default 'usuario')
       const usuario = await User.create({
         nome,
         email,
-        senha: senhaHash
+        senha: senhaHash,
+        role: role
       });
+
+      // Remove a senha do retorno por segurança
+      usuario.senha = undefined;
 
       res.status(201).json(usuario);
 

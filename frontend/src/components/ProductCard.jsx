@@ -2,8 +2,8 @@ import { useMemo, useState } from 'react';
 
 import api from '../services/api';
 
-// 1. Adicionamos 'adicionarAoCarrinho' aqui nas propriedades recebidas
-function ProductCard({ produto, onChange, adicionarAoCarrinho }) {
+// 1. ADICIONADO: Recebemos o 'usuario' aqui junto com as outras propriedades
+function ProductCard({ produto, onChange, adicionarAoCarrinho, usuario }) {
   const initialForm = useMemo(
     () => ({
       nome: produto?.nome ?? '',
@@ -55,12 +55,24 @@ function ProductCard({ produto, onChange, adicionarAoCarrinho }) {
     }
   }
 
+  // RESTAURADO: Código da função de exclusão que havia sido cortado
   async function excluirProduto() {
     const ok = confirm(
       `Tem certeza que deseja excluir o produto "${produto.nome}"?`
     );
     if (!ok) return;
 
+    try {
+      setIsDeleting(true);
+      await api.delete(`/produtos/${produto._id}`);
+      await onChange?.();
+      alert('Produto excluído com sucesso!');
+    } catch (error) {
+      console.log(error);
+      alert('Erro ao excluir produto');
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -157,35 +169,38 @@ function ProductCard({ produto, onChange, adicionarAoCarrinho }) {
               Marca: {produto.marca}
             </span>
 
-            {/* 2. ADICIONADO: Botão de Adicionar ao Carrinho com um estilo básico destacado */}
-            <button 
-              type="button" 
-              onClick={() => adicionarAoCarrinho?.(produto)}
-              disabled={isDeleting}
-              style={{ 
-                marginTop: '15px', 
-                width: '100%', 
-                backgroundColor: '#28a745', 
-                color: 'white',
-                padding: '10px',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              🛒 Adicionar ao Carrinho
-            </button>
-
-            {/* Coloquei uma pequena margem superior aqui para desgrudar do botão de cima */}
-            <div className="card-actions" style={{ marginTop: '10px' }}>
-              <button type="button" onClick={startEdit} disabled={isDeleting}>
-                Editar
+            {/* 2. ALTERADO: Regra para diferenciar os botões por cargo (RBAC) */}
+            {usuario?.role === 'admin' ? (
+              /* Se for administrador, aparecem APENAS os botões de Editar e Excluir */
+              <div className="card-actions" style={{ marginTop: '15px' }}>
+                <button type="button" onClick={startEdit} disabled={isDeleting}>
+                  Editar
+                </button>
+                <button type="button" className="danger" onClick={excluirProduto} disabled={isDeleting}>
+                  {isDeleting ? 'Excluindo...' : 'Excluir'}
+                </button>
+              </div>
+            ) : (
+              /* Se for cliente comum (ou qualquer outro), aparece APENAS o Adicionar ao Carrinho */
+              <button 
+                type="button" 
+                onClick={() => adicionarAoCarrinho?.(produto)}
+                disabled={isDeleting}
+                style={{ 
+                  marginTop: '15px', 
+                  width: '100%', 
+                  backgroundColor: '#28a745', 
+                  color: 'white',
+                  padding: '10px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                🛒 Adicionar ao Carrinho
               </button>
-              <button type="button" className="danger" onClick={excluirProduto} disabled={isDeleting}>
-                {isDeleting ? 'Excluindo...' : 'Excluir'}
-              </button>
-            </div>
+            )}
           </>
         )
       }

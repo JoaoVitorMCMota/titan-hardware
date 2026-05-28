@@ -19,30 +19,12 @@ const options = {
           type: 'object',
           required: ['nome', 'descricao', 'preco', 'estoque', 'marca'],
           properties: {
-            _id: {
-              type: 'string',
-              description: 'ID do produto'
-            },
-            nome: {
-              type: 'string',
-              description: 'Nome do produto'
-            },
-            descricao: {
-              type: 'string',
-              description: 'Descrição do produto'
-            },
-            preco: {
-              type: 'number',
-              description: 'Preço do produto'
-            },
-            estoque: {
-              type: 'number',
-              description: 'Quantidade em estoque'
-            },
-            marca: {
-              type: 'string',
-              description: 'Marca do produto'
-            }
+            _id: { type: 'string', description: 'ID do produto' },
+            nome: { type: 'string', description: 'Nome do produto' },
+            descricao: { type: 'string', description: 'Descrição do produto' },
+            preco: { type: 'number', description: 'Preço do produto' },
+            estoque: { type: 'number', description: 'Quantidade em estoque' },
+            marca: { type: 'string', description: 'Marca do produto' }
           },
           example: {
             _id: '507f1f77bcf86cd799439011',
@@ -57,23 +39,37 @@ const options = {
           type: 'object',
           required: ['nome', 'descricao'],
           properties: {
-            _id: {
-              type: 'string',
-              description: 'ID da categoria'
-            },
-            nome: {
-              type: 'string',
-              description: 'Nome da categoria'
-            },
-            descricao: {
-              type: 'string',
-              description: 'Descrição da categoria'
-            }
+            _id: { type: 'string', description: 'ID da categoria' },
+            nome: { type: 'string', description: 'Nome da categoria' },
+            descricao: { type: 'string', description: 'Descrição da categoria' }
           },
           example: {
             _id: '507f1f77bcf86cd799439012',
             nome: 'Processadores',
             descricao: 'Processadores de computador'
+          }
+        },
+        // ADICIONADO: Schema do Usuário para aparecer globalmente no Swagger
+        Usuario: {
+          type: 'object',
+          required: ['nome', 'email', 'senha'],
+          properties: {
+            _id: { type: 'string', description: 'ID gerado pelo MongoDB' },
+            nome: { type: 'string', description: 'Nome do usuário' },
+            email: { type: 'string', description: 'E-mail único de acesso' },
+            senha: { type: 'string', description: 'Senha de acesso (será criptografada)' },
+            role: { 
+              type: 'string', 
+              enum: ['admin', 'usuario'], 
+              default: 'usuario',
+              description: 'Nível de permissão do usuário' 
+            }
+          },
+          example: {
+            nome: 'Administrador Titan',
+            email: 'admin@titan.com',
+            senha: 'senhaSegura123',
+            role: 'admin'
           }
         }
       }
