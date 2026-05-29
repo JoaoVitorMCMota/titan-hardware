@@ -1,76 +1,134 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 
 import Home from './pages/Home';
 import CreateProduct from './pages/CreateProduct';
 import Login from './pages/Login';
-import Carrinho from './pages/Carrinho'; // Nova página
+import Carrinho from './pages/Carrinho';
 
 import Navbar from './components/Navbar';
 import './styles/global.css';
 
-function App() {
-  const [usuario, setUsuario] = useState(null); // Guarda { email, role }
-  const [carrinho, setCarrinho] = useState([]);
+function ProtectedRoute({ usuario, children }) {
+  if (!usuario) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
 
-  // 1. Ao iniciar, verifica se já existe um usuário logado
-  useEffect(() => {
-    const emailSalvo = localStorage.getItem('user_email');
-    const roleSalva = localStorage.getItem('user_role');
-    
-    if (emailSalvo && roleSalva) {
-      setUsuario({ email: emailSalvo, role: roleSalva });
-      
-      // Carrega o carrinho específico desse email
-      const carrinhoSalvo = localStorage.getItem(`carrinho_${emailSalvo}`);
-      if (carrinhoSalvo) setCarrinho(JSON.parse(carrinhoSalvo));
-    }
-  }, []);
+function readAuthFromStorage() {
+  const emailSalvo = localStorage.getItem('user_email');
+  const roleSalva = localStorage.getItem('user_role');
 
-  // 2. Função chamada pelo Login quando der certo
+  if (!emailSalvo || !roleSalva) {
+    return { usuario: null, carrinho: [] };
+  }
+
+  const carrinhoSalvo = localStorage.getItem(`carrinho_${emailSalvo}`);
+  return {
+    usuario: { email: emailSalvo, role: roleSalva },
+    carrinho: carrinhoSalvo ? JSON.parse(carrinhoSalvo) : []
+  };
+}
+
+function AppRoutes() {
+  const navigate = useNavigate();
+  const [usuario, setUsuario] = useState(() => readAuthFromStorage().usuario);
+  const [carrinho, setCarrinho] = useState(() => readAuthFromStorage().carrinho);
+
   const loginSucesso = (email, role) => {
     setUsuario({ email, role });
-    // Busca o carrinho do usuário que acabou de logar
     const carrinhoSalvo = localStorage.getItem(`carrinho_${email}`);
     setCarrinho(carrinhoSalvo ? JSON.parse(carrinhoSalvo) : []);
   };
 
-  // 3. Função para deslogar (Sair)
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_role');
     setUsuario(null);
     setCarrinho([]);
+    navigate('/login', { replace: true });
   };
 
-  // 4. Função para adicionar item ao carrinho do usuário atual
   const adicionarAoCarrinho = (produto) => {
+    if (!usuario) return;
     const novoCarrinho = [...carrinho, produto];
     setCarrinho(novoCarrinho);
-    // Salva no localStorage atrelado ao email dele
     localStorage.setItem(`carrinho_${usuario.email}`, JSON.stringify(novoCarrinho));
     alert(`${produto.nome} adicionado ao carrinho!`);
   };
 
   return (
-    <BrowserRouter>
-      {/* Passamos o usuário e o logout para a Navbar */}
+    <>
       <Navbar carrinho={carrinho} usuario={usuario} onLogout={logout} />
-
       <Routes>
-        {/* A tela inicial (/) agora é o Login */}
-        <Route path="/" element={usuario ? <Navigate to="/home" /> : <Login onLoginSuccess={loginSucesso} />} />
-        
-        {/* Nova rota para a Home */}
-        <Route path="/home" element={usuario ? <Home adicionarAoCarrinho={adicionarAoCarrinho} usuario={usuario} /> : <Navigate to="/" />} />
-        
-        {/* Rota para Criar Produto (Apenas Admin) */}
-        <Route path="/criar-produto" element={usuario?.role === 'admin' ? <CreateProduct /> : <Navigate to="/home" />} />
-        
-        {/* Nova rota para a página exclusiva do Carrinho */}
-        <Route path="/carrinho" element={usuario ? <Carrinho carrinho={carrinho} emailUsuario={usuario.email} setCarrinho={setCarrinho} /> : <Navigate to="/" />} />
+        <Route
+          path="/"
+          element={
+            <Navigate to={usuario ? '/home' : '/login'} replace />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            usuario ? (
+              <Navigate to="/home" replace />
+            ) : (
+              <Login onLoginSuccess={loginSucesso} />
+            )
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute usuario={usuario}>
+              <Home
+                usuario={usuario}
+                adicionarAoCarrinho={adicionarAoCarrinho}
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/criar-produto"
+          element={
+            <ProtectedRoute usuario={usuario}>
+              {usuario?.role === 'admin' ? (
+                <CreateProduct />
+              ) : (
+                <Navigate to="/home" replace />
+              )}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/carrinho"
+          element={
+            <ProtectedRoute usuario={usuario}>
+              <Carrinho
+                carrinho={carrinho}
+                emailUsuario={usuario?.email}
+                setCarrinho={setCarrinho}
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Navigate to={usuario ? '/home' : '/login'} replace />
+          }
+        />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
     </BrowserRouter>
   );
 }

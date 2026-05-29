@@ -24,7 +24,7 @@ export default function Login({ onLoginSuccess }) {
         localStorage.setItem('user_email', email);
         
         // ATENÇÃO: Verifique se sua API retorna o campo com o nome 'role' ou 'cargo'
-        const cargo = dados.role || 'cliente'; 
+        const cargo = dados.usuario?.role || dados.role || 'cliente'; 
         localStorage.setItem('user_role', cargo);
 
         // Avisa o App.jsx que o login deu certo

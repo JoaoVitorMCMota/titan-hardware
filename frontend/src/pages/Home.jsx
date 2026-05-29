@@ -3,8 +3,7 @@ import api from '../services/api';
 import ProductCard from '../components/ProductCard';
 
 // 1. Recebemos as propriedades que vieram do App.jsx
-function Home({ adicionarAoCarrinho, carrinho }) {
-
+function Home({ adicionarAoCarrinho, usuario }) {
   const [produtos, setProdutos] = useState([]);
 
   async function buscarProdutos() {
@@ -22,7 +21,6 @@ function Home({ adicionarAoCarrinho, carrinho }) {
   }
 
   useEffect(() => {
-    // Chamei carregarProdutos() direto aqui para padronizar
     carregarProdutos();
   }, []);
 

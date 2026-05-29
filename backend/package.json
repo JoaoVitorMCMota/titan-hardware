@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "dev": "nodemon server.js"
-},
+    "dev": "nodemon server.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -19,7 +19,8 @@
     "mongodb": "^7.2.0",
     "mongoose": "^9.6.2",
     "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "test": "^3.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

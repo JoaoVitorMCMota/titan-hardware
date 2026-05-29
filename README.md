@@ -83,7 +83,7 @@ Crie um arquivo `.env` na pasta `backend` com as variáveis abaixo. Use valores 
 
 | Variável | Obrigatória | Descrição | Exemplo (fictício) |
 |----------|-------------|-----------|-------------------|
-| `MONGO_URI` | Sim | URI de conexão com o MongoDB | `mongodb+srv://usuario:senha123@cluster0.exemplo.mongodb.net/titan-hardware?retryWrites=true&w=majority` |
+| `MONGO_URI` | Sim | URI de conexão com o MongoDB | `mongodb+srv://SEU_USUARIO:SUA_SENHA@cluster0.exemplo.mongodb.net/SEU_PROJETO?retryWrites=true&w=majority` |
 | `JWT_SECRET` | Sim* | Chave secreta para assinar tokens JWT no login | `minha_chave_secreta_dev_abc123xyz` |
 | `PORT` | Não | Porta HTTP do servidor (padrão: `3000`) | `3000` |
 
@@ -92,10 +92,12 @@ Crie um arquivo `.env` na pasta `backend` com as variáveis abaixo. Use valores 
 **Exemplo de arquivo `.env`:**
 
 ```env
-MONGO_URI=mongodb+srv://usuario:senha123@cluster0.exemplo.mongodb.net/titan-hardware?retryWrites=true&w=majority
+MONGO_URI=mongodb+srv://SEU_USUARIO:SUA_SENHA@cluster0.exemplo.mongodb.net/SEU_PROJETO?retryWrites=true&w=majority
 JWT_SECRET=minha_chave_secreta_dev_abc123xyz
 PORT=3000
 ```
-# Autor
+SEU_USUARIO: Seu usuário para acessar o banco de dados.
+SUA_SENHA: Sua senha para acessar o banco de dados.
+SEU_PROJETO: Nome do seu projeto.
 
 João Vítor
