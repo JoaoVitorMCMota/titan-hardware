@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 import Home from './pages/Home';
 import CreateProduct from './pages/CreateProduct';
@@ -33,6 +33,8 @@ function readAuthFromStorage() {
 
 function AppRoutes() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const exibirNavbar = location.pathname !== '/login';
   const [usuario, setUsuario] = useState(() => readAuthFromStorage().usuario);
   const [carrinho, setCarrinho] = useState(() => readAuthFromStorage().carrinho);
 
@@ -61,7 +63,9 @@ function AppRoutes() {
 
   return (
     <>
-      <Navbar carrinho={carrinho} usuario={usuario} onLogout={logout} />
+      {exibirNavbar && (
+        <Navbar carrinho={carrinho} usuario={usuario} onLogout={logout} />
+      )}
       <Routes>
         <Route
           path="/"

@@ -29,6 +29,7 @@ body {
   justify-content: space-between;
 
   align-items: center;
+
 }
 
 .navbar a {
@@ -37,17 +38,60 @@ body {
   text-decoration: none;
 
   margin-left: 20px;
+  
+}
+.container {
+  display: flex;
+  padding: 30px;
+  flex-direction: column;
+  margin: 0 auto;
 }
 
-.container {
-  padding: 30px;
+.home-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.home-toolbar input {
+  flex: 1;
+  min-width: 220px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.home-toolbar button {
+  padding: 12px 16px;
+  border: none;
+  background-color: #111;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.home-toolbar button.secondary {
+  background-color: #6b7280;
+}
+
+.home-toolbar button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.home-empty {
+  margin-top: 24px;
+  color: #d1d5db;
 }
 
 .products-grid {
-  display: grid;
+  display: flex;
 
-  grid-template-columns:
-    repeat(auto-fit, minmax(250px, 1fr));
+  justify-content: space-around;
+
+  flex-wrap: wrap;
 
   gap: 20px;
 
@@ -67,6 +111,8 @@ body {
     0px 2px 10px rgba(0,0,0,0.3);
 
   transition: 0.3s;
+
+  width: 385px;
 }
 
 .card h2 {

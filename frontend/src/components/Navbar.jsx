@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 function Navbar({ carrinho, usuario, onLogout }) {
   return (
     <nav className="navbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px', background: '#222', color: '#fff' }}>
-      <h2>Titan Hardware</h2>
+      <h2 className="navbar-title">Titan Hardware</h2>
       
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
         {/* Se tiver usuário logado, mostra os links */}

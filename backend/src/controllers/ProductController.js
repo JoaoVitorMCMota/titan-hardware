@@ -3,7 +3,18 @@ import Product from '../models/Product.js';
 class ProductController {
   async listar(req, res) {
     try {
-      const produtos = await Product.find();
+      const { nome } = req.query;
+      const filtro = nome?.trim()
+        ? {
+            $or: [
+              { nome: { $regex: nome.trim(), $options: 'i' } },
+              { marca: { $regex: nome.trim(), $options: 'i' } },
+              { descricao: { $regex: nome.trim(), $options: 'i' } }
+            ]
+          }
+        : {};
+
+      const produtos = await Product.find(filtro);
       res.json(produtos);
     } catch (error) {
       res.status(500).json({ error: error.message });
