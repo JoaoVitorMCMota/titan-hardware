@@ -71,6 +71,39 @@ const options = {
             senha: 'senhaSegura123',
             role: 'admin'
           }
+        },
+        Carrinho: {
+          type: 'object',
+          required: ['usuario', 'produtos'],
+          properties: {
+            _id: { type: 'string', description: 'ID do carrinho' },
+            usuario: { type: 'string', description: 'ID do usuário proprietário do carrinho' },
+            produtos: {
+              type: 'array',
+              description: 'Lista de produtos no carrinho',
+              items: {
+                type: 'object',
+                properties: {
+                  produto: { type: 'string', description: 'ID do produto' },
+                  quantidade: { type: 'number', description: 'Quantidade do produto' }
+                }
+              }
+            }
+          },
+          example: {
+            _id: '507f1f77bcf86cd799439013',
+            usuario: '507f1f77bcf86cd799439001',
+            produtos: [
+              {
+                produto: '507f1f77bcf86cd799439011',
+                quantidade: 2
+              },
+              {
+                produto: '507f1f77bcf86cd799439012',
+                quantidade: 1
+              }
+            ]
+          }
         }
       }
     }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 export default function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -10,33 +11,21 @@ export default function Login({ onLoginSuccess }) {
   const fazerLogin = async (e) => {
     e.preventDefault();
     try {
-      const resposta = await fetch('http://localhost:3000/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, senha })
-      });
+      const resposta = await api.post('/auth/login', { email, senha });
+      const dados = resposta.data;
 
-      const dados = await resposta.json();
+      localStorage.setItem('token', dados.token);
+      localStorage.setItem('user_id', dados.usuario._id);
+      localStorage.setItem('user_email', email);
 
-      if (resposta.ok) {
-        // Salva os dados básicos no navegador
-        localStorage.setItem('token', dados.token);
-        localStorage.setItem('user_email', email);
-        
-        // ATENÇÃO: Verifique se sua API retorna o campo com o nome 'role' ou 'cargo'
-        const cargo = dados.usuario?.role || dados.role || 'cliente'; 
-        localStorage.setItem('user_role', cargo);
+      const cargo = dados.usuario?.role || dados.role || 'cliente';
+      localStorage.setItem('user_role', cargo);
 
-        // Avisa o App.jsx que o login deu certo
-        onLoginSuccess(email, cargo);
-        
-        // Redireciona para a Home
-        navigate('/home');
-      } else {
-        setErro(dados.error || 'Credenciais inválidas.');
-      }
+      onLoginSuccess(email, cargo, dados.usuario._id);
+      navigate('/home');
     } catch (error) {
-      setErro('Erro de conexão com o servidor.');
+      const mensagemApi = error.response?.data?.error || error.response?.data?.mensagem;
+      setErro(mensagemApi || 'Erro de conexão com o servidor.');
     }
   };
 

@@ -7,6 +7,7 @@ import swaggerSpec from './docs/swagger.js';
 import productRoutes from './routes/productRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
 // 1. ADICIONADO: Importa as novas rotas de gerenciamento de usuários
 import userRoutes from './routes/userRoutes.js';
 
@@ -26,6 +27,8 @@ app.get('/', (req, res) => {
 app.use('/produtos', productRoutes);
 app.use('/categorias', categoryRoutes);
 app.use('/auth', authRoutes);
+//rota para o carrinho
+app.use("/carrinho", cartRoutes);
 
 // 2. ADICIONADO: Registra o endpoint público /usuarios mapeado para o CRUD
 app.use('/usuarios', userRoutes);

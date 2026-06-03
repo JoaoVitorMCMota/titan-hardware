@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 import Home from './pages/Home';
@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Carrinho from './pages/Carrinho';
 
 import Navbar from './components/Navbar';
+import api from './services/api';
 import './styles/global.css';
 
 function ProtectedRoute({ usuario, children }) {
@@ -19,15 +20,14 @@ function ProtectedRoute({ usuario, children }) {
 function readAuthFromStorage() {
   const emailSalvo = localStorage.getItem('user_email');
   const roleSalva = localStorage.getItem('user_role');
+  const userIdSalvo = localStorage.getItem('user_id');
 
-  if (!emailSalvo || !roleSalva) {
-    return { usuario: null, carrinho: [] };
+  if (!emailSalvo || !roleSalva || !userIdSalvo) {
+    return { usuario: null };
   }
 
-  const carrinhoSalvo = localStorage.getItem(`carrinho_${emailSalvo}`);
   return {
-    usuario: { email: emailSalvo, role: roleSalva },
-    carrinho: carrinhoSalvo ? JSON.parse(carrinhoSalvo) : []
+    usuario: { email: emailSalvo, role: roleSalva, id: userIdSalvo }
   };
 }
 
@@ -36,29 +36,53 @@ function AppRoutes() {
   const location = useLocation();
   const exibirNavbar = location.pathname !== '/login';
   const [usuario, setUsuario] = useState(() => readAuthFromStorage().usuario);
-  const [carrinho, setCarrinho] = useState(() => readAuthFromStorage().carrinho);
+  const [carrinho, setCarrinho] = useState({ produtos: [] });
 
-  const loginSucesso = (email, role) => {
-    setUsuario({ email, role });
-    const carrinhoSalvo = localStorage.getItem(`carrinho_${email}`);
-    setCarrinho(carrinhoSalvo ? JSON.parse(carrinhoSalvo) : []);
+  useEffect(() => {
+    if (usuario?.id) {
+      carregarCarrinho(usuario.id);
+    }
+  }, [usuario?.id]);
+
+  const loginSucesso = (email, role, userId) => {
+    setUsuario({ email, role, id: userId });
+    carregarCarrinho(userId);
+  };
+
+  const carregarCarrinho = async (usuarioId) => {
+    try {
+      const response = await api.get(`/carrinho/${usuarioId}`);
+      setCarrinho(response.data);
+    } catch (error) {
+      console.log('Carrinho vazio ou erro ao carregar:', error);
+      setCarrinho({ usuario: usuarioId, produtos: [] });
+    }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_role');
+    localStorage.removeItem('user_id');
     setUsuario(null);
-    setCarrinho([]);
+    setCarrinho({ produtos: [] });
     navigate('/login', { replace: true });
   };
 
-  const adicionarAoCarrinho = (produto) => {
+  const adicionarAoCarrinho = async (produto) => {
     if (!usuario) return;
-    const novoCarrinho = [...carrinho, produto];
-    setCarrinho(novoCarrinho);
-    localStorage.setItem(`carrinho_${usuario.email}`, JSON.stringify(novoCarrinho));
-    alert(`${produto.nome} adicionado ao carrinho!`);
+    
+    try {
+      const response = await api.post(`/carrinho/${usuario.id}/adicionar`, {
+        produtoId: produto._id,
+        quantidade: 1
+      });
+      setCarrinho(response.data);
+      alert(`${produto.nome} adicionado ao carrinho!`);
+    } catch (error) {
+      console.error('Erro ao adicionar ao carrinho:', error);
+      alert('Erro ao adicionar produto ao carrinho');
+    }
   };
 
   return (
@@ -112,6 +136,7 @@ function AppRoutes() {
             <ProtectedRoute usuario={usuario}>
               <Carrinho
                 carrinho={carrinho}
+                usuarioId={usuario?.id}
                 emailUsuario={usuario?.email}
                 setCarrinho={setCarrinho}
               />
