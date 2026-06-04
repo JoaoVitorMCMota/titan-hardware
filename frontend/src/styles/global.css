@@ -87,8 +87,8 @@ body {
 }
 
 .products-grid {
-  display: flex;
-
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   justify-content: space-around;
 
   flex-wrap: wrap;
@@ -166,6 +166,21 @@ body {
   padding: 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
+}
+
+.divImagem {
+    max-width: 320px;
+    max-height: 280px;
+    display: flex;
+    margin: 0 auto;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.divImagem img{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .form {

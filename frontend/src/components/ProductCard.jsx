@@ -10,7 +10,8 @@ function ProductCard({ produto, onChange, adicionarAoCarrinho, usuario }) {
       descricao: produto?.descricao ?? '',
       preco: produto?.preco ?? '',
       estoque: produto?.estoque ?? '',
-      marca: produto?.marca ?? ''
+      marca: produto?.marca ?? '',
+      imagem: produto?.imagem ?? null
     }),
     [produto]
   );
@@ -19,15 +20,33 @@ function ProductCard({ produto, onChange, adicionarAoCarrinho, usuario }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [form, setForm] = useState(initialForm);
+  const [imagemFile, setImagemFile] = useState(null);
+  const [previewImagem, setPreviewImagem] = useState(null);
 
   function startEdit() {
     setForm(initialForm);
+    setImagemFile(null);
+    setPreviewImagem(null);
     setIsEditing(true);
   }
 
   function cancelEdit() {
     setForm(initialForm);
+    setImagemFile(null);
+    setPreviewImagem(null);
     setIsEditing(false);
+  }
+
+  function handleImagemChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setImagemFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImagem(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   async function salvarEdicao(e) {
@@ -36,15 +55,25 @@ function ProductCard({ produto, onChange, adicionarAoCarrinho, usuario }) {
     try {
       setIsSaving(true);
 
-      await api.put(`/produtos/${produto._id}`, {
-        nome: form.nome,
-        descricao: form.descricao,
-        preco: Number(form.preco),
-        estoque: Number(form.estoque),
-        marca: form.marca
+      const formData = new FormData();
+      formData.append('nome', form.nome);
+      formData.append('descricao', form.descricao);
+      formData.append('preco', Number(form.preco));
+      formData.append('estoque', Number(form.estoque));
+      formData.append('marca', form.marca);
+      if (imagemFile) {
+        formData.append('imagem', imagemFile);
+      }
+
+      await api.put(`/produtos/${produto._id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
       setIsEditing(false);
+      setImagemFile(null);
+      setPreviewImagem(null);
       await onChange?.();
       alert('Produto atualizado com sucesso!');
     } catch (error) {
@@ -81,6 +110,23 @@ function ProductCard({ produto, onChange, adicionarAoCarrinho, usuario }) {
       {
         isEditing ? (
           <form className="product-edit-form" onSubmit={salvarEdicao}>
+            {previewImagem && (
+              <div>
+                <img 
+                  src={previewImagem} 
+                  alt="Preview" 
+/*                   style={{ maxWidth: '200px', maxHeight: '200px', marginBottom: '10px' }} 
+ */                />
+              </div>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImagemChange}
+              style={{ marginBottom: '10px' }}
+            />
+
             <input
               type="text"
               placeholder="Nome"
@@ -157,6 +203,20 @@ function ProductCard({ produto, onChange, adicionarAoCarrinho, usuario }) {
           </form>
         ) : (
           <>
+            {produto.imagem && (
+              <div className='divImagem'>
+                <img 
+                src={`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}${produto.imagem}`}
+                alt={produto.nome}
+                style={{ 
+                  width: '100%', 
+                  /* height: 'auto' */
+                  objectFit: 'cover'
+                }}
+              />
+              </div>
+            )}
+            
             <h2>{produto.nome}</h2>
 
             <p>{produto.descricao}</p>

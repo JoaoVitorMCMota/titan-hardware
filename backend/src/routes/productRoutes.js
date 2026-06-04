@@ -1,5 +1,6 @@
 import express from 'express';
 import ProductController from '../controllers/ProductController.js';
+import upload from '../config/upload.js';
 
 const router = express.Router();
 
@@ -27,20 +28,28 @@ router.get('/', ProductController.listar);
  * @swagger
  * /produtos:
  *   post:
- *     summary: Cria um novo produto
+ *     summary: Cria um novo produto com imagem
  *     tags: [Produtos]
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Produto'
- *           example:
- *             nome: "Processador Intel i7"
- *             descricao: "Processador de alta performance para gaming"
- *             preco: 2500
- *             estoque: 15
- *             marca: "Intel"
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               descricao:
+ *                 type: string
+ *               preco:
+ *                 type: number
+ *               estoque:
+ *                 type: number
+ *               marca:
+ *                 type: string
+ *               imagem:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Produto criado com sucesso
@@ -51,7 +60,7 @@ router.get('/', ProductController.listar);
  *       400:
  *         description: Erro na validação dos dados
  */
-router.post('/', ProductController.criar);
+router.post('/', upload.single('imagem'), ProductController.criar);
 
 /**
  * @swagger
@@ -96,15 +105,23 @@ router.get('/:id', ProductController.buscarPorId);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Produto'
- *           example:
- *             nome: "Processador Intel i7 atualizado"
- *             descricao: "Versão melhorada"
- *             preco: 2800
- *             estoque: 10
- *             marca: "Intel"
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               descricao:
+ *                 type: string
+ *               preco:
+ *                 type: number
+ *               estoque:
+ *                 type: number
+ *               marca:
+ *                 type: string
+ *               imagem:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Produto atualizado com sucesso
@@ -117,7 +134,7 @@ router.get('/:id', ProductController.buscarPorId);
  *       400:
  *         description: Erro na validação dos dados
  */
-router.put('/:id', ProductController.atualizar);
+router.put('/:id', upload.single('imagem'), ProductController.atualizar);
 
 /**
  * @swagger
@@ -148,5 +165,38 @@ router.put('/:id', ProductController.atualizar);
  *         description: Erro ao deletar produto
  */
 router.delete('/:id', ProductController.deletar);
+
+/**
+ * @swagger
+ * /produtos/{id}/upload:
+ *   post:
+ *     summary: Faz upload de imagem para um produto
+ *     tags: [Produtos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID do produto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imagem:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Imagem enviada com sucesso
+ *       404:
+ *         description: Produto não encontrado
+ *       400:
+ *         description: Erro ao enviar imagem
+ */
+router.post('/:id/upload', upload.single('imagem'), ProductController.uploadImagem);
 
 export default router;

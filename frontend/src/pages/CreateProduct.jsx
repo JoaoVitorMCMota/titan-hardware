@@ -9,6 +9,20 @@ function CreateProduct() {
   const [preco, setPreco] = useState('');
   const [estoque, setEstoque] = useState('');
   const [marca, setMarca] = useState('');
+  const [imagem, setImagem] = useState(null);
+  const [previewImagem, setPreviewImagem] = useState(null);
+
+  function handleImagemChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setImagem(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImagem(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   async function criarProduto(e) {
 
@@ -16,12 +30,20 @@ function CreateProduct() {
 
     try {
 
-      await api.post('/produtos', {
-        nome,
-        descricao,
-        preco,
-        estoque,
-        marca
+      const formData = new FormData();
+      formData.append('nome', nome);
+      formData.append('descricao', descricao);
+      formData.append('preco', preco);
+      formData.append('estoque', estoque);
+      formData.append('marca', marca);
+      if (imagem) {
+        formData.append('imagem', imagem);
+      }
+
+      await api.post('/produtos', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
       alert('Produto criado com sucesso!');
@@ -31,6 +53,8 @@ function CreateProduct() {
       setPreco('');
       setEstoque('');
       setMarca('');
+      setImagem(null);
+      setPreviewImagem(null);
 
     } catch (error) {
 
@@ -95,6 +119,22 @@ function CreateProduct() {
             setMarca(e.target.value)
           }
         />
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImagemChange}
+        />
+
+        {previewImagem && (
+          <div>
+            <img 
+              src={previewImagem} 
+              alt="Preview" 
+              /* style={{ maxWidth: '200px', maxHeight: '200px' }}  */
+            />
+          </div>
+        )}
 
         <button type="submit">
           Criar Produto

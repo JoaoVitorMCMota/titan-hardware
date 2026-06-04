@@ -12,8 +12,10 @@ vi.mock('../services/api', () => ({
   }
 }));
 
+
+
 const produtoMock = {
-  _id: 'prod1',
+  _id: '507f1f77bcf86cd799439011',
   nome: 'RTX 4090',
   descricao: 'Placa de vídeo top de linha',
   preco: 9999,
@@ -94,9 +96,15 @@ describe('ProductCard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
 
     await vi.waitFor(() => {
-      expect(api.put).toHaveBeenCalledWith('/produtos/prod1', expect.objectContaining({
-        nome: 'RTX 4090 Ti'
-      }));
+      expect(api.put).toHaveBeenCalledWith(
+        '/produtos/507f1f77bcf86cd799439011',
+        expect.any(FormData),
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
     });
   });
 
@@ -109,7 +117,7 @@ describe('ProductCard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Excluir' }));
 
     await vi.waitFor(() => {
-      expect(api.delete).toHaveBeenCalledWith('/produtos/prod1');
+      expect(api.delete).toHaveBeenCalledWith('/produtos/507f1f77bcf86cd799439011');
     });
   });
 });

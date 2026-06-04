@@ -24,6 +24,11 @@ const productSchema = new mongoose.Schema({
   marca: {
     type: String,
     required: true
+  },
+
+  imagem: {
+    type: String,
+    default: null
   }
 });
 

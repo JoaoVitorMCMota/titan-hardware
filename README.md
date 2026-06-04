@@ -17,6 +17,7 @@ A solução é dividida em:
 |------|-----------|
 | **Autenticação** | Registro e login com JWT; sessão persistida no `localStorage`. |
 | **Produtos** | CRUD completo; busca por nome, marca ou descrição. |
+| **Upload de Imagens** | Upload de imagens para produtos (JPEG, PNG, GIF, WebP); limite 5MB; preview antes de salvar. |
 | **Categorias** | CRUD de categorias de produtos. |
 | **Carrinho** | Adicionar, remover e limpar itens por usuário. |
 | **Usuários** | CRUD de usuários com roles `admin` e `usuario`. |
@@ -28,9 +29,12 @@ A solução é dividida em:
 titan-hardware/
 ├── backend/
 │   ├── server.js                 # Ponto de entrada
+│   ├── upload/                   # Pasta onde as imagens dos produtos são salvas
 │   └── src/
 │       ├── app.js                # Configuração Express e rotas
-│       ├── config/database.js    # Conexão MongoDB
+│       ├── config/
+│       │   ├── database.js       # Conexão MongoDB
+│       │   └── upload.js         # Configuração do multer para upload de imagens
 │       ├── controllers/          # Lógica de negócio (Auth, User, Product, Category, Cart)
 │       ├── models/               # Schemas Mongoose
 │       ├── routes/               # Rotas da API
@@ -43,6 +47,7 @@ titan-hardware/
 │       ├── pages/                # Home, Login, Registro, Carrinho, etc.
 │       └── services/api.js       # Cliente HTTP (Axios)
 ├── SOLID.md                      # Documentação dos princípios SOLID aplicados
+├── UPLOAD_IMAGENS.md             # Documentação completa do sistema de upload
 └── README.md
 ```
 
@@ -57,6 +62,27 @@ Antes de clonar e executar o projeto, instale:
 | MongoDB | Cluster no [MongoDB Atlas](https://www.mongodb.com/atlas) ou instância local |
 
 Não é obrigatório Docker para rodar o projeto localmente.
+
+### Dependências do Backend
+
+As dependências principais instaladas automaticamente via `npm install`:
+
+- **Express** — framework web HTTP
+- **Mongoose** — ODM para MongoDB
+- **Multer** — middleware para upload de arquivos
+- **bcryptjs** — hash seguro de senhas
+- **jsonwebtoken** — autenticação JWT
+- **cors** — CORS middleware
+- **swagger-jsdoc** e **swagger-ui-express** — documentação e UI OpenAPI
+- **dotenv** — gerenciamento de variáveis de ambiente
+
+### Dependências do Frontend
+
+- **React** — biblioteca de UI
+- **React Router** — roteamento entre páginas
+- **Axios** — cliente HTTP
+- **Vite** — bundler e dev server
+
 
 ## Instalação e execução local
 
@@ -104,6 +130,62 @@ A interface fica disponível em **http://localhost:5173** (porta padrão do Vite
 - Acesse **http://localhost:3000** — resposta JSON da API (`Titan Hardware API`).
 - Certifique-se de que o backend está rodando antes de usar o frontend.
 
+## Upload de Imagens
+
+O sistema permite que administradores façam upload de imagens para produtos. As imagens são armazenadas na pasta `backend/upload/` e servidas via HTTP.
+
+### Como usar
+
+#### Criar produto com imagem
+1. Navegue até a página **"Criar Produto"** (requer login com perfil `admin`)
+2. Preencha os campos: Nome, Descrição, Preço, Estoque, Marca
+3. Clique em "Escolher Arquivo" e selecione uma imagem (JPEG, PNG, GIF ou WebP)
+4. Veja o preview da imagem
+5. Clique em "Criar Produto"
+
+#### Editar imagem de produto existente
+1. Na página **Home**, clique em "Editar" em um produto
+2. Opcionalmente, selecione uma nova imagem
+3. Clique em "Salvar"
+
+#### Via API
+```bash
+# Criar produto com imagem
+curl -X POST \
+  -F "nome=Processador Intel i7" \
+  -F "descricao=Processador de alta performance" \
+  -F "preco=2500" \
+  -F "estoque=15" \
+  -F "marca=Intel" \
+  -F "imagem=@/caminho/para/imagem.jpg" \
+  http://localhost:3000/produtos
+
+# Upload de imagem em produto existente
+curl -X POST \
+  -F "imagem=@/caminho/para/imagem.jpg" \
+  http://localhost:3000/produtos/{id}/upload
+```
+
+### Especificações
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Formatos aceitos** | JPEG, PNG, GIF, WebP |
+| **Limite de tamanho** | 5 MB |
+| **Armazenamento** | `backend/upload/` |
+| **Acesso** | `http://localhost:3000/upload/nome-arquivo.jpg` |
+| **Validação** | Tipo MIME + extensão de arquivo |
+
+### Segurança
+
+- ✅ Validação de tipo de arquivo (apenas imagens)
+- ✅ Limite de tamanho (5 MB)
+- ✅ Nomes únicos com timestamp para evitar conflitos
+- ✅ Remoção automática de imagens antigas ao deletar produto
+- ✅ Remoção automática de imagens antigas ao substituir
+
+Para mais detalhes, consulte [UPLOAD_IMAGENS.md](./UPLOAD_IMAGENS.md).
+
 ## Rotas do frontend
 
 | Rota | Acesso | Descrição |
@@ -122,7 +204,9 @@ Usuários não autenticados são redirecionados para `/login`. Rotas administrat
 | Prefixo | Descrição |
 |---------|-----------|
 | `GET /` | Status da API |
-| `/produtos` | CRUD e busca de produtos |
+| `/produtos` | CRUD e busca de produtos com suporte a upload de imagens |
+| `/produtos/{id}/upload` | Upload de imagem para produto existente |
+| `/upload` | Servir arquivos de imagem salvos (estático) |
 | `/categorias` | CRUD de categorias |
 | `/auth/register` | Registro de usuário |
 | `/auth/login` | Login (retorna JWT) |
@@ -200,9 +284,23 @@ npm run test:watch  # modo watch
 
 Cobertura: componentes **ProductCard**, **Navbar** e página **Login**.
 
+**Nota:** Os testes do **ProductCard** cobrem também a funcionalidade de upload de imagens (preview, manipulação de files, etc).
+
 ## Arquitetura e SOLID
 
 A aplicação segue uma arquitetura em camadas (MVC no backend, componentes e serviços no frontend). A documentação detalhada de como os princípios SOLID foram aplicados está em [SOLID.md](./SOLID.md).
+
+## Melhorias Futuras
+
+Algumas funcionalidades que podem ser adicionadas:
+
+- Compressão e otimização automática de imagens
+- Armazenamento em serviço de cloud (AWS S3, Google Cloud Storage, etc)
+- Crop e resize de imagens no frontend antes de enviar
+- Testes de integração para upload de imagens
+- Galeria com múltiplas imagens por produto
+- Validação de dimensões de imagem (largura mínima, etc)
+- Cache de imagens no frontend
 
 ## Autor
 
