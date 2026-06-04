@@ -2,6 +2,33 @@ import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 
 class UserController {
+  async criar(req, res) {
+    try {
+      const { nome, email, senha, role } = req.body;
+
+      const usuarioExiste = await User.findOne({ email });
+      if (usuarioExiste) {
+        return res.status(400).json({ error: 'Já existe uma conta vinculada a esse Email' });
+      }
+
+      const senhaHash = await bcrypt.hash(senha, 8);
+
+      const usuario = await User.create({
+        nome,
+        email,
+        senha: senhaHash,
+        role: role || 'usuario'
+      });
+
+      const usuarioSemSenha = usuario.toObject();
+      delete usuarioSemSenha.senha;
+
+      res.status(201).json(usuarioSemSenha);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
   async listar(req, res) {
     try {
       // .select('-senha') impede que o hash da senha vaze na listagem

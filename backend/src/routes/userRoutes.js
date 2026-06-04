@@ -6,6 +6,37 @@ const router = express.Router();
 /**
  * @swagger
  * /usuarios:
+ *   post:
+ *     summary: Cria um novo usuário
+ *     tags: [Usuários]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nome, email, senha]
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [admin, usuario]
+ *     responses:
+ *       201:
+ *         description: Usuário criado com sucesso
+ *       400:
+ *         description: Erro na validação dos dados
+ */
+router.post('/', UserController.criar);
+
+/**
+ * @swagger
+ * /usuarios:
  *   get:
  *     summary: Lista todos os usuários cadastrados
  *     tags: [Usuários]

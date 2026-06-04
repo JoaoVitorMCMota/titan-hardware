@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 export default function Login({ onLoginSuccess }) {
@@ -7,6 +7,8 @@ export default function Login({ onLoginSuccess }) {
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const mensagemSucesso = location.state?.mensagem;
 
   const fazerLogin = async (e) => {
     e.preventDefault();
@@ -30,14 +32,21 @@ export default function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="container" style={{ maxWidth: '400px', marginTop: '100px' }}>
-      <h2>Login - Titan Hardware</h2>
-      <form onSubmit={fazerLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        <input type="email" placeholder="Seu Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Sua Senha" value={senha} onChange={(e) => setSenha(e.target.value)} required />
-        <button type="submit">Entrar</button>
+    <div className="container" style={{marginTop: '12%' }}>
+      <h2 style={{fontSize:"2.4rem"}}>Login - Titan Hardware</h2>
+      <form className="form" onSubmit={fazerLogin}>
+        <input id="email" type="email" placeholder="Seu Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input id="senha" type="password" placeholder="Sua Senha" value={senha} onChange={(e) => setSenha(e.target.value)} required />
+        <button id="enviar" type="submit" style={{fontSize:"22px"}}>Entrar</button>
       </form>
+      {mensagemSucesso && <p style={{ color: '#4ade80', marginTop: '10px' }}>{mensagemSucesso}</p>}
       {erro && <p style={{ color: 'red', marginTop: '10px' }}>{erro}</p>}
+      <p style={{ marginTop: '20px' }}>
+        Não possui uma conta?{' '}
+        <Link to="/registro" style={{ color: '#93c5fd' }}>
+          Criar conta
+        </Link>
+      </p>
     </div>
   );
 }

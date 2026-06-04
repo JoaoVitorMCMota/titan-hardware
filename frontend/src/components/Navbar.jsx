@@ -16,7 +16,10 @@ function Navbar({ carrinho, usuario, onLogout }) {
             
             {/* SÓ MOSTRA SE FOR ADMIN */}
             {usuario.role === 'admin' && (
-              <Link to="/criar-produto" style={{ color: '#fff', textDecoration: 'none' }}>Criar Produto</Link>
+              <>
+                <Link to="/criar-produto" style={{ color: '#fff', textDecoration: 'none' }}>Criar Produto</Link>
+                <Link to="/gerenciar-usuarios" style={{ color: '#fff', textDecoration: 'none' }}>Usuários</Link>
+              </>
             )}
 
             <Link to="/carrinho" style={{ color: '#fff', textDecoration: 'none', fontWeight: 'bold' }}>

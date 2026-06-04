@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from
 
 import Home from './pages/Home';
 import CreateProduct from './pages/CreateProduct';
+import GerenciarUsuarios from './pages/GerenciarUsuarios';
 import Login from './pages/Login';
+import Registro from './pages/Registro';
 import Carrinho from './pages/Carrinho';
 
 import Navbar from './components/Navbar';
@@ -14,6 +16,33 @@ function ProtectedRoute({ usuario, children }) {
   if (!usuario) {
     return <Navigate to="/login" replace />;
   }
+  return children;
+}
+
+function AdminRoute({ usuario, children }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (usuario && usuario.role !== 'admin') {
+      const timer = setTimeout(() => {
+        navigate('/home', { replace: true });
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [usuario, navigate]);
+
+  if (!usuario) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (usuario.role !== 'admin') {
+    return (
+      <div className="container">
+        <p className="access-denied">Acesso negado</p>
+      </div>
+    );
+  }
+
   return children;
 }
 
@@ -34,7 +63,7 @@ function readAuthFromStorage() {
 function AppRoutes() {
   const navigate = useNavigate();
   const location = useLocation();
-  const exibirNavbar = location.pathname !== '/login';
+  const exibirNavbar = !['/login', '/registro'].includes(location.pathname);
   const [usuario, setUsuario] = useState(() => readAuthFromStorage().usuario);
   const [carrinho, setCarrinho] = useState({ produtos: [] });
 
@@ -108,6 +137,16 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/registro"
+          element={
+            usuario ? (
+              <Navigate to="/home" replace />
+            ) : (
+              <Registro />
+            )
+          }
+        />
+        <Route
           path="/home"
           element={
             <ProtectedRoute usuario={usuario}>
@@ -121,13 +160,17 @@ function AppRoutes() {
         <Route
           path="/criar-produto"
           element={
-            <ProtectedRoute usuario={usuario}>
-              {usuario?.role === 'admin' ? (
-                <CreateProduct />
-              ) : (
-                <Navigate to="/home" replace />
-              )}
-            </ProtectedRoute>
+            <AdminRoute usuario={usuario}>
+              <CreateProduct />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/gerenciar-usuarios"
+          element={
+            <AdminRoute usuario={usuario}>
+              <GerenciarUsuarios />
+            </AdminRoute>
           }
         />
         <Route

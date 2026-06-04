@@ -70,10 +70,9 @@ export default function Carrinho({ carrinho, usuarioId, emailUsuario, setCarrinh
   return (
     <div className="container" style={{ padding: '20px' }}>
       <h1>Seu Carrinho de Compras</h1>
-      <p>Gerenciando os itens salvos para: <strong>{emailUsuario}</strong></p>
 
       {produtos.length === 0 ? (
-        <p>O seu carrinho está vazio no momento. Vá para a Home e escolha alguns hardwares!</p>
+        <p className="subtituloCarrinho">O seu carrinho está vazio no momento. Vá para a Home e escolha alguns hardwares!</p>
       ) : (
         <div>
           <ul style={{ listStyle: 'none', padding: 0 }}>
@@ -88,12 +87,12 @@ export default function Carrinho({ carrinho, usuarioId, emailUsuario, setCarrinh
                   alignItems: 'center'
                 }}
               >
-                <div>
+                <div style={{textAlign:'start'}}>
                   <span>{item.produto?.nome} ({item.produto?.marca})</span>
-                  <p style={{ margin: '5px 0', fontSize: '0.9em', color: '#666' }}>
+                  <p style={{ margin: '5px 0', fontSize: '0.9em', color: '#a8cbff'}}>
                     Quantidade: {item.quantidade} | Preço unitário: R$ {item.produto?.preco?.toFixed(2)}
                   </p>
-                  <p style={{ margin: '5px 0', fontWeight: 'bold', color: '#333' }}>
+                  <p style={{ margin: '5px 0', fontWeight: 'bold', color: '#d7e6ff'}}>
                     Subtotal: R$ {(item.produto?.preco * item.quantidade)?.toFixed(2)}
                   </p>
                 </div>

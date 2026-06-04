@@ -24,7 +24,7 @@ const router = express.Router();
  *       201:
  *         description: Usuário criado com sucesso
  *       400:
- *         description: Usuário já existe
+ *         description: Já existe uma conta vinculada a esse Email
  */
 router.post('/register', AuthController.register);
 
