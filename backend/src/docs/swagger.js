@@ -32,7 +32,8 @@ const options = {
             descricao: 'Processador de última geração',
             preco: 1500.00,
             estoque: 20,
-            marca: 'Intel'
+            marca: 'Intel',
+            imagem: '/upload/IntelI5-1780599788424-628517407.webp'
           }
         },
         Categoria: {
